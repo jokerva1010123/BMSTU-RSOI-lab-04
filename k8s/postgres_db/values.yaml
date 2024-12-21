@@ -1,0 +1,16 @@
+namespace: jokerva1010123
+
+svc:
+  port: 5432
+  targetPort: 5432
+
+image: library/postgres:13
+
+pg:
+  default:
+    user: postgres
+    password: postgres
+    db: postgres
+  primary:
+    user: program
+    password: test

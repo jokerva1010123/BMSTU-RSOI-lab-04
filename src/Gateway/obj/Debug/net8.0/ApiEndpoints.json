@@ -1,0 +1,149 @@
+[
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "GetAllFights",
+    "RelativePath": "api/v1/flights",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "size",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "GetUserInfoByUsername",
+    "RelativePath": "api/v1/me",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "X-User-Name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "GetBonusInfoByUsername",
+    "RelativePath": "api/v1/privilege",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "X-User-Name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "GetTicketInfoByUsername",
+    "RelativePath": "api/v1/tickets",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "X-User-Name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "BuyTicket",
+    "RelativePath": "api/v1/tickets",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "X-User-Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "ticket",
+        "Type": "ModelDTO.Response.TicketBuy",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "GetTicketInfoByUid",
+    "RelativePath": "api/v1/tickets/{ticketUid}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ticketUid",
+        "Type": "System.Guid",
+        "IsRequired": true
+      },
+      {
+        "Name": "X-User-Name",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.GatewayController",
+    "Method": "CancleTicket",
+    "RelativePath": "api/v1/tickets/{ticketUid}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "X-User-Name",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "guid",
+        "Type": "System.Guid",
+        "IsRequired": false
+      },
+      {
+        "Name": "ticketUid",
+        "Type": "",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "Gateway.Controllers.HealthController",
+    "Method": "HealthCheck",
+    "RelativePath": "manage/health",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]

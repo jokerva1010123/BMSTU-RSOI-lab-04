@@ -1,7 +1,7 @@
 name: GitHub Classroom Workflow
 on:
   push:
-    branches: [ master ]
+    branches: [ master, main ]
 jobs:
   build:
     name: Autograding
@@ -14,25 +14,85 @@ jobs:
       - uses: docker/setup-buildx-action@v2
 
       # TODO build, publish to docker hub, deploy to k8s
+      - name: Build images
+        timeout-minutes: 10
+        run: docker compose build
 
-      - name: Run API Tests
-        uses: matt-ball/newman-action@master
+      - name: Run containers
+        timeout-minutes: 10
+        run: |
+          docker compose up -d
+          ./scripts/wait-script.sh
+        env:
+          WAIT_PORTS: 8080,8070,8060,8050
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
         with:
-          collection: <variant>/postman/collection.json
-          environment: <variant>/postman/environment.json
-          delayRequest: 100
-          reporters: '[ "cli" ]'
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Push the images to Docker Hub
+        run: |
+          docker push jokerva1010123/flight-service:latest 
+          docker push jokerva1010123/bonus-service:latest
+          docker push jokerva1010123/ticket-service:latest
+          docker push jokerva1010123/gateway:latest
+      - name: Setup Minikube
+        uses: medyagh/setup-minikube@master
+  
+      - name: Check Minikube Cluster
+        run: |
+          kubectl get pods -A
+  
+      - name: Create Namespace in Cluster
+        run: |
+          kubectl create namespace jokerva1010123
+
+      - name: Deploy DB and services
+        run: |
+          kubectl get namespace
+          cd k8s
+          echo "------------------Deploy Postgres DB------------------"
+          helm delete postgres --namespace jokerva1010123 --ignore-not-found
+          helm install -n jokerva1010123 postgres ./postgres_db
+          echo "------------------Deploy Services------------------"
+          helm delete reserv --namespace jokerva1010123 --ignore-not-found
+          helm install -n jokerva1010123 reserv ./services
+
+      - name: Wait 30s
+        uses: jakejarvis/wait-action@master
+        with:
+          time: '30s'
+      - name: Get all resources from namespace jokerva1010123 in Cluster
+        run: |
+          kubectl get all -n jokerva1010123
+          kubectl get services -n jokerva1010123
+
+      - name: Setup Ingress
+        run: |
+          cd k8s/networking
+          minikube service gateway -n jokerva1010123 --url
+          kubectl apply -f ingress.yaml
+          kubectl get ingress
+          sudo echo "$(minikube ip) myapp.local" | sudo tee -a /etc/hosts
+          URL=$(minikube service flight -n jokerva1010123 --url)
+          echo "SERVICE_URL=$URL" >> $GITHUB_ENV
+          echo "Service URL is: $URL"
+          echo "Using service at: ${{ env.SERVICE_URL }}"
+      
+      - name: Setup Postman environment (app url)
+        uses: sergeysova/jq-action@v2
+        id: version
+        with:
+          cmd: >-
+            jq '.values[0].value = "http://${{ secrets.PROD_HOST }}:${{ secrets.PROD_PORT }}"'
+            < v1/postman/environment.json > out.tmp &&
+            mv out.tmp v1/postman/environment.json
 
       - uses: education/autograding@v1
         id: autograder
         continue-on-error: true
 
-      - name: Github auto grader mark
-        uses: Romanow/google-sheet-autograder-marker@v1.0
-        with:
-          google_token: ${{secrets.GOOGLE_API_KEY}}
-          sheet_id: "1xkgjUX6Qmk7rdJG-QPOToav-HWWtthJjnShIKnw3oIY"
-          homework_number: 4
-          user_column: 'D'
-          column_offset: 'F'
-          mark: "'+"
+      - name: Stop containers
+        if: always()
+        continue-on-error: true
+        run: docker compose down -v
