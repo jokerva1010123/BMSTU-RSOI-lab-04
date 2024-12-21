@@ -4,7 +4,7 @@
 	"values": [
 		{
 			"key": "baseUrl",
-			"value": "",
+			"value": "http://abc:10",
 			"enabled": true
 		}
 	],
