@@ -70,14 +70,10 @@ jobs:
       - name: Setup Ingress
         run: |
           cd k8s/networking
-          minikube service gateway -n jokerva1010123 --url
           kubectl apply -f ingress.yaml
           kubectl get ingress
           sudo echo "$(minikube ip) myapp.local" | sudo tee -a /etc/hosts
           URL=$(minikube service flight -n jokerva1010123 --url)
-          echo "SERVICE_URL=$URL" >> $GITHUB_ENV
-          echo "Service URL is: $URL"
-          echo "Using service at: ${{ env.SERVICE_URL }}"
       
       - name: Setup Postman environment (app url)
         uses: sergeysova/jq-action@v2
